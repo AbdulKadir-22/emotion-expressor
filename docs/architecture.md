@@ -25,6 +25,17 @@ graph TD
     DB -->|loads| JSON[data/emojis.json]
     DB -->|contains| Emoji[Emoji Struct]
     
-    UI[Phase 2: GTK4 UI] -.->|will consume| Search
-    UI -.->|will consume| Config
+    UI[Phase 2: GTK4 UI] -->|consumes| Search
+    UI -->|consumes| Config
+    UI -->|copies via| Clipboard[Platform Clipboard]
 ```
+
+## Licensing & Third-Party Dependencies
+
+- **Application Codebase**: Licensed under the **GNU General Public License v3.0 (GPL-3.0)**. See [`LICENSE`](../LICENSE) for details.
+- **Emoji Dataset (`data/emojis.json`)**: Derived from Unicode CLDR / GitHub Gemoji under the **MIT License**.
+- **Third-Party Libraries**:
+  - `nlohmann_json`: MIT License
+  - `Catch2`: Boost Software License 1.0 (BSL-1.0)
+  - `gtkmm-4.0`: GNU Lesser General Public License v2.1+ (LGPL-2.1+)
+

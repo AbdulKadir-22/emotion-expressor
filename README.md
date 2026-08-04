@@ -32,16 +32,21 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 │   └── README.md           # Dataset documentation and licensing
 ├── docs/
 │   ├── architecture.md     # Multi-phase system architecture
-│   └── phase1_core.md      # Core data layer API documentation
+│   ├── phase1_core.md      # Core data layer API documentation
+│   └── phase2_ui.md        # GTK4 / gtkmm UI layer API documentation
 ├── src/
+│   ├── app/                # GTK Application setup & CSS provider
 │   ├── core/
 │   │   ├── Emoji.hpp / .cpp         # Emoji value type & json parser
 │   │   ├── EmojiDatabase.hpp / .cpp # Emoji database loader & lookup maps
 │   │   └── EmojiSearch.hpp / .cpp   # Multi-tier ranked search engine
+│   ├── platform/           # Platform integration (Clipboard, ShortcutManager, WindowManager)
+│   ├── ui/                 # GTK4 UI components (MainWindow, SearchBar)
 │   ├── utils/
 │   │   ├── Config.hpp / .cpp        # Config manager (~/.config/emoji-picker/config.json)
 │   │   └── Logger.hpp / .cpp        # Leveled std::format logger
-│   └── main.cpp            # CLI smoke test harness (interactive & query mode)
+│   ├── cli_main.cpp        # CLI smoke test harness (interactive & query mode)
+│   └── main.cpp            # GTK4 application entry point
 └── tests/                  # Catch2 unit test suite
     ├── test_database.cpp
     ├── test_search.cpp
@@ -103,7 +108,7 @@ Interactive REPL mode:
 ## Roadmap
 
 - [x] **Phase 1**: Core Data Layer (Dataset, Database, Ranked Search Engine, Config, Logger, CLI & Tests)
-- [ ] **Phase 2**: GTK4 / gtkmm UI (Grid view, search bar, category navigation, recents)
+- [x] **Phase 2**: GTK4 / gtkmm UI (Window layout, SearchBar, ListView, real-time filtering & clipboard copy)
 - [ ] **Phase 3**: Global Shortcuts & Wayland Clipboard Integration (Portal / XDG Global Shortcuts)
 - [ ] **Phase 4**: Packaging, Flatpak & Performance Optimization
 
@@ -111,5 +116,7 @@ Interactive REPL mode:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-The emoji dataset is derived from Unicode CLDR / GitHub Gemoji (MIT License).
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details.
+
+The emoji dataset (`data/emojis.json`) is derived from Unicode CLDR / GitHub Gemoji and is licensed under the **MIT License**.
+
