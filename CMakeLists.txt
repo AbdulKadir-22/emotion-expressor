@@ -30,7 +30,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-# Core & Utils library target
+# GTK4 / gtkmm-4.0 Dependency
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-4.0)
+
+# Core & Utils library target (GTK-free)
 add_library(emoji_core STATIC
     src/core/Emoji.cpp
     src/core/Emoji.hpp
@@ -47,8 +51,34 @@ add_library(emoji_core STATIC
 target_include_directories(emoji_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(emoji_core PUBLIC nlohmann_json::nlohmann_json)
 
-# CLI Smoke Test Executable
-add_executable(emoji_cli src/main.cpp)
+# UI & Platform library target
+add_library(emoji_ui STATIC
+    src/app/Application.cpp
+    src/app/Application.hpp
+    src/ui/MainWindow.cpp
+    src/ui/MainWindow.hpp
+    src/ui/SearchBar.cpp
+    src/ui/SearchBar.hpp
+    src/platform/Clipboard.cpp
+    src/platform/Clipboard.hpp
+    src/platform/ShortcutManager.cpp
+    src/platform/ShortcutManager.hpp
+    src/platform/WindowManager.cpp
+    src/platform/WindowManager.hpp
+)
+
+target_include_directories(emoji_ui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(emoji_ui PUBLIC emoji_core PkgConfig::GTKMM)
+
+# Main GTK Application Executable Target
+add_executable(emotion_expressor src/main.cpp)
+target_link_libraries(emotion_expressor PRIVATE emoji_ui)
+
+# CLI Smoke Test Executable Target (Phase 1 regression checking)
+add_executable(emoji_picker_cli src/cli_main.cpp)
+target_link_libraries(emoji_picker_cli PRIVATE emoji_core)
+
+add_executable(emoji_cli src/cli_main.cpp)
 target_link_libraries(emoji_cli PRIVATE emoji_core)
 
 # Unit Tests Executable

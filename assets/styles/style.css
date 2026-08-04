@@ -1,0 +1,89 @@
+/* Emotion Expressor - GTK4 / gtkmm4 Stylesheet */
+
+window.popup-window {
+    background-color: transparent;
+}
+
+.app-container {
+    background-color: #1e1e2e;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    margin: 10px;
+    padding: 12px;
+}
+
+.search-bar-container {
+    margin-bottom: 8px;
+}
+
+.search-entry {
+    background-color: #2a2a3c;
+    color: #cdd6f4;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.search-entry:focus-within {
+    border-color: #89b4fa;
+    box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
+}
+
+.emoji-scrolled {
+    background-color: transparent;
+    border: none;
+}
+
+.emoji-list {
+    background-color: transparent;
+}
+
+.emoji-row {
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+
+listview row:hover .emoji-row {
+    background-color: #313244;
+}
+
+listview row:selected .emoji-row {
+    background-color: #45475a;
+}
+
+.emoji-glyph {
+    font-size: 26px;
+    margin-right: 12px;
+}
+
+.emoji-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #cdd6f4;
+}
+
+.emoji-detail {
+    font-size: 11px;
+    color: #a6adc8;
+}
+
+.footer-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 8px;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+.footer-hint {
+    font-size: 11px;
+    color: #a6adc8;
+    font-weight: 500;
+}
+
+.footer-sep {
+    font-size: 11px;
+    color: #585b70;
+}

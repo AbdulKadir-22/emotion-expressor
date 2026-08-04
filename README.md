@@ -1,3 +1,4 @@
+
 # Emotion Expressor 😃🔥🐱
 
 A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Linux desktop environments.
