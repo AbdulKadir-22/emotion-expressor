@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Expressor - Emoji Picker</title>
+  <style>
+    /* Dark Slate Palette Variables (matching target design) */
+    :root {
+      --bg-outer: #111420;
+      --border-outer: #1f273b;
+      --card-bg: #171d2b;
+      --card-border: rgba(255, 255, 255, 0.04);
+      --card-hover: #222a3e;
+      --card-active: #1d2844;
+      --input-bg: #1b2131;
+      --input-border: #283147;
+      --text-main: #e2e8f0;
+      --text-muted: #64748b;
+      --text-sub: #8c9bb5;
+      --accent-blue: #2563eb;
+      --footer-bg: #161c2a;
+      --footer-border: #242d42;
+      --kbd-bg: #1f283b;
+      --kbd-border: #2d3852;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0d15;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    /* Main Window Container */
+    .emoji-picker-window {
+      width: 440px;
+      background-color: var(--bg-outer);
+      border-radius: 18px;
+      border: 1px solid var(--border-outer);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      user-select: none;
+    }
+
+    /* Header & Search Input */
+    .picker-header {
+      width: 100%;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      stroke: #5a6787;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 40px 0 42px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: #273044;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: background-color 0.15s, color 0.15s;
+    }
+
+    .clear-btn:hover {
+      background-color: #35425e;
+      color: #ffffff;
+    }
+
+    /* Emoji Grid Container */
+    .emoji-grid-container {
+      max-height: 330px;
+      overflow-y: auto;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--input-border) transparent;
+    }
+
+    .emoji-grid-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .emoji-grid-container::-webkit-scrollbar-thumb {
+      background-color: var(--input-border);
+      border-radius: 3px;
+    }
+
+    /* 7 Columns Grid Layout */
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    /* Individual Emoji Tile */
+    .emoji-tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      font-size: 25px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.15s, transform 0.1s, border-color 0.15s;
+      outline: none;
+    }
+
+    .emoji-tile:hover {
+      background-color: var(--card-hover);
+      transform: scale(1.05);
+    }
+
+    .emoji-tile.active,
+    .emoji-tile:focus {
+      background-color: var(--card-active);
+      border: 2px solid var(--accent-blue);
+      outline: none;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Footer Preview & Hotkeys Bar */
+    .picker-footer {
+      background-color: var(--footer-bg);
+      border: 1px solid var(--footer-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preview-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-emoji {
+      font-size: 32px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .preview-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .preview-alias {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .hotkey-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hotkey-unit {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kbd {
+      background-color: var(--kbd-bg);
+      border: 1px solid var(--kbd-border);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .kbd-label {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .footer-divider {
+      width: 1px;
+      height: 20px;
+      background-color: var(--footer-border);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="emoji-picker-window">
+    <!-- Header / Search Entry -->
+    <div class="picker-header">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search emoji..." value="smile" autocomplete="off" autofocus>
+        <button id="clearBtn" class="clear-btn" title="Clear search">&times;</button>
+      </div>
+    </div>
+
+    <!-- 7-Column Emoji Grid Container -->
+    <div class="emoji-grid-container">
+      <div id="emojiGrid" class="emoji-grid">
+        <!-- Emoji tiles populated dynamically by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Footer Preview & Action Badges -->
+    <div class="picker-footer">
+      <div class="preview-left">
+        <div id="previewEmoji" class="preview-emoji">😄</div>
+        <div class="preview-details">
+          <span id="previewName" class="preview-name">Grinning Face With Smiling Eyes</span>
+          <span id="previewAlias" class="preview-alias">:smile:</span>
+        </div>
+      </div>
+      <div class="hotkey-right">
+        <div class="hotkey-unit">
+          <span class="kbd">Esc</span>
+          <span class="kbd-label">Close</span>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="hotkey-unit">
+          <span class="kbd">Enter</span>
+          <span class="kbd-label">Copy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Emoji Dataset matching screenshot
+    const EMOJIS = [
+      { char: '😄', name: 'Grinning Face With Smiling Eyes', alias: ':smile:', keywords: ['smile', 'happy', 'joy'] },
+      { char: '😁', name: 'Beaming Face With Smiling Eyes', alias: ':grin:', keywords: ['grin', 'smile'] },
+      { char: '😃', name: 'Grinning Face With Big Eyes', alias: ':smiley:', keywords: ['smiley', 'smile'] },
+      { char: '😅', name: 'Grinning Face With Sweat', alias: ':sweat_smile:', keywords: ['sweat', 'smile'] },
+      { char: '😆', name: 'Grinning Squinting Face', alias: ':laughing:', keywords: ['laugh', 'smile'] },
+      { char: '🥹', name: 'Face Holding Back Tears', alias: ':holding_back_tears:', keywords: ['tears', 'smile', 'plead'] },
+      { char: '😊', name: 'Smiling Face With Smiling Eyes', alias: ':blush:', keywords: ['blush', 'smile'] },
+
+      { char: '😇', name: 'Smiling Face With Halo', alias: ':innocent:', keywords: ['halo', 'angel', 'smile'] },
+      { char: '🙂', name: 'Slightly Smiling Face', alias: ':slightly_smiling_face:', keywords: ['smile'] },
+      { char: '🙃', name: 'Upside-Down Face', alias: ':upside_down:', keywords: ['silly', 'smile'] },
+      { char: '😉', name: 'Winking Face', alias: ':wink:', keywords: ['wink', 'smile'] },
+      { char: '😌', name: 'Relieved Face', alias: ':relieved:', keywords: ['relieved', 'smile'] },
+      { char: '😍', name: 'Smiling Face With Heart-Eyes', alias: ':heart_eyes:', keywords: ['love', 'heart', 'smile'] },
+      { char: '🥰', name: 'Smiling Face With Hearts', alias: ':smiling_face_with_3_hearts:', keywords: ['love', 'hearts', 'smile'] },
+
+      { char: '😘', name: 'Face Blowing a Kiss', alias: ':kissing_heart:', keywords: ['kiss', 'love', 'smile'] },
+      { char: '😗', name: 'Kissing Face', alias: ':kissing:', keywords: ['kiss', 'smile'] },
+      { char: '😙', name: 'Kissing Face With Smiling Eyes', alias: ':kissing_smiling_eyes:', keywords: ['kiss', 'smile'] },
+      { char: '😋', name: 'Face Savoring Food', alias: ':yum:', keywords: ['yum', 'delicious', 'smile'] },
+      { char: '😛', name: 'Face With Tongue', alias: ':stuck_out_tongue:', keywords: ['tongue', 'silly', 'smile'] },
+      { char: '😜', name: 'Winking Face With Tongue', alias: ':stuck_out_tongue_winking_eye:', keywords: ['wink', 'tongue', 'smile'] },
+      { char: '🤪', name: 'Zany Face', alias: ':zany_face:', keywords: ['zany', 'goofy', 'smile'] },
+
+      { char: '😝', name: 'Squinting Face With Tongue', alias: ':stuck_out_tongue_closed_eyes:', keywords: ['tongue', 'smile'] },
+      { char: '🫠', name: 'Melting Face', alias: ':melting_face:', keywords: ['melt', 'hot', 'smile'] },
+      { char: '😎', name: 'Smiling Face With Sunglasses', alias: ':sunglasses:', keywords: ['cool', 'sunglasses', 'smile'] },
+      { char: '🤓', name: 'Nerd Face', alias: ':nerd_face:', keywords: ['nerd', 'glasses', 'smile'] },
+      { char: '🧐', name: 'Face With Monocle', alias: ':monocle_face:', keywords: ['monocle', 'curious'] },
+      { char: '😠', name: 'Angry Face', alias: ':angry:', keywords: ['angry', 'mad'] },
+      { char: '🤠', name: 'Cowboy Hat Face', alias: ':cowboy_hat_face:', keywords: ['cowboy', 'hat', 'smile'] },
+
+      { char: '🥳', name: 'Partying Face', alias: ':partying_face:', keywords: ['party', 'celebrate', 'smile'] },
+      { char: '😏', name: 'Smirking Face', alias: ':smirk:', keywords: ['smirk', 'silly'] },
+      { char: '😔', name: 'Pensive Face', alias: ':pensive:', keywords: ['sad', 'pensive'] },
+      { char: '😟', name: 'Worried Face', alias: ':worried:', keywords: ['worried', 'sad'] },
+      { char: '😮', name: 'Face With Open Mouth', alias: ':open_mouth:', keywords: ['surprised', 'wow'] },
+      { char: '😫', name: 'Tired Face', alias: ':tired_face:', keywords: ['tired', 'frustrated'] },
+      { char: '😤', name: 'Face With Steam From Nose', alias: ':triumph:', keywords: ['steam', 'huff'] },
+
+      { char: '😸', name: 'Grinning Cat With Smiling Eyes', alias: ':smile_cat:', keywords: ['cat', 'smile'] },
+      { char: '😺', name: 'Grinning Cat', alias: ':smiley_cat:', keywords: ['cat', 'smile'] },
+      { char: '😹', name: 'Cat With Tears of Joy', alias: ':joy_cat:', keywords: ['cat', 'tears', 'joy'] },
+      { char: '😻', name: 'Smiling Cat With Heart-Eyes', alias: ':heart_eyes_cat:', keywords: ['cat', 'love'] },
+      { char: '😽', name: 'Kissing Cat', alias: ':kissing_cat:', keywords: ['cat', 'kiss'] },
+      { char: '😼', name: 'Cat With Wry Smile', alias: ':smirk_cat:', keywords: ['cat', 'smirk'] },
+      { char: '🙀', name: 'Weary Cat', alias: ':scream_cat:', keywords: ['cat', 'weary'] }
+    ];
+
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const emojiGrid = document.getElementById('emojiGrid');
+    const previewEmoji = document.getElementById('previewEmoji');
+    const previewName = document.getElementById('previewName');
+    const previewAlias = document.getElementById('previewAlias');
+
+    let filteredEmojis = [...EMOJIS];
+    let selectedIndex = 0;
+    const COLUMNS = 7;
+
+    function renderGrid() {
+      emojiGrid.innerHTML = '';
+      if (filteredEmojis.length === 0) {
+        emojiGrid.style.display = 'block';
+        emojiGrid.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No emojis found</div>';
+        updatePreview(null);
+        return;
+      }
+
+      emojiGrid.style.display = 'grid';
+      filteredEmojis.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-tile' + (index === selectedIndex ? ' active' : '');
+        btn.textContent = item.char;
+        btn.setAttribute('title', `${item.name} (${item.alias})`);
+        
+        btn.addEventListener('click', () => {
+          setSelectedIndex(index);
+          copyEmoji(item.char);
+        });
+
+        btn.addEventListener('mouseenter', () => {
+          setSelectedIndex(index);
+        });
+
+        emojiGrid.appendChild(btn);
+      });
+
+      updatePreview(filteredEmojis[selectedIndex] || null);
+    }
+
+    function setSelectedIndex(index) {
+      if (filteredEmojis.length === 0) return;
+      selectedIndex = Math.max(0, Math.min(index, filteredEmojis.length - 1));
+
+      const tiles = emojiGrid.querySelectorAll('.emoji-tile');
+      tiles.forEach((t, idx) => {
+        if (idx === selectedIndex) {
+          t.classList.add('active');
+          t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        } else {
+          t.classList.remove('active');
+        }
+      });
+
+      updatePreview(filteredEmojis[selectedIndex] || null);
+    }
+
+    function updatePreview(item) {
+      if (!item) {
+        previewEmoji.textContent = '🔍';
+        previewName.textContent = 'No matching emoji';
+        previewAlias.textContent = '';
+        return;
+      }
+      previewEmoji.textContent = item.char;
+      previewName.textContent = item.name;
+      previewAlias.textContent = item.alias;
+    }
+
+    function filterEmojis(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        filteredEmojis = [...EMOJIS];
+      } else {
+        filteredEmojis = EMOJIS.filter(e => 
+          e.name.toLowerCase().includes(q) ||
+          e.alias.toLowerCase().includes(q) ||
+          e.keywords.some(k => k.toLowerCase().includes(q)) ||
+          e.char === q
+        );
+      }
+      selectedIndex = 0;
+      renderGrid();
+    }
+
+    function copyEmoji(char) {
+      navigator.clipboard.writeText(char).then(() => {
+        console.log('Copied emoji:', char);
+      }).catch(() => {});
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      filterEmojis(e.target.value);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filterEmojis('');
+      searchInput.focus();
+    });
+
+    // Capture phase event listener for 4-directional arrow key grid navigation
+    window.addEventListener('keydown', (e) => {
+      if (filteredEmojis.length === 0) return;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex - 1);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex + COLUMNS);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex - COLUMNS);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filteredEmojis[selectedIndex]) {
+          copyEmoji(filteredEmojis[selectedIndex].char);
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        searchInput.value = '';
+        filterEmojis('');
+      }
+    }, true);
+
+    // Initial render
+    filterEmojis('smile');
+  </script>
+</body>
+</html>
