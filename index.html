@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Picker</title>
+  <style>
+    /* Base Theme Variables (Preserving your original dark palette) */
+    :root {
+      --bg-color: #1e1e2d;
+      --card-bg: #252538;
+      --input-bg: #2b2b40;
+      --border-color: #3b3b54;
+      --text-muted: #8c8ca8;
+      --text-main: #ffffff;
+      --accent-hover: #3d3d5c;
+      --accent-active: #4a4a70;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #12121c;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Main Container */
+    .emoji-picker {
+      width: 350px;
+      height: 420px;
+      background-color: var(--bg-color);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Header & Search Bar */
+    .picker-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 36px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: #6c5ce7;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Emoji Grid Container */
+    .emoji-grid-container {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+    }
+
+    .emoji-grid-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .emoji-grid-container::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 3px;
+    }
+
+    /* Grid Layout */
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr); /* 6 columns fit nicely in 350px width */
+      gap: 6px;
+    }
+
+    /* Individual Emoji Cell */
+    .emoji-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      font-size: 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s, transform 0.1s;
+      background: transparent;
+      border: none;
+    }
+
+    .emoji-item:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.15);
+    }
+
+    .emoji-item:focus,
+    .emoji-item.selected {
+      background-color: var(--accent-active);
+      outline: 2px solid #6c5ce7;
+      outline-offset: -2px;
+    }
+
+    /* Footer / Hotkey Hints */
+    .picker-footer {
+      padding: 10px 14px;
+      background-color: rgba(0, 0, 0, 0.15);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .hotkey-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .hotkey-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="emoji-picker">
+    <!-- Header -->
+    <div class="picker-header">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search emoji..." value="smile">
+        <button class="clear-btn">&times;</button>
+      </div>
+    </div>
+
+    <!-- Grid Section -->
+    <div class="emoji-grid-container">
+      <div class="emoji-grid">
+        <!-- Native tooltips via title attribute keep the text off-screen -->
+        <button class="emoji-item" title="grinning face with smiling eyes (:smile:)">😄</button>
+        <button class="emoji-item" title="grinning face (:grinning:)">😀</button>
+        <button class="emoji-item" title="cat with wry smile (:smirk_cat:)">😼</button>
+        <button class="emoji-item" title="grinning cat (:smiley_cat:)">😺</button>
+        <button class="emoji-item" title="grinning face with big eyes (:smiley:)">😃</button>
+        <button class="emoji-item" title="grinning cat with smiling eyes (:smile_cat:)">😸</button>
+        <button class="emoji-item" title="beaming face with smiling eyes">😁</button>
+        <button class="emoji-item" title="grinning squinting face">😆</button>
+        <button class="emoji-item" title="sweat smile">😅</button>
+        <button class="emoji-item" title="rolling on the floor laughing">🤣</button>
+        <button class="emoji-item" title="face with tears of joy">😂</button>
+        <button class="emoji-item" title="slightly smiling face">🙂</button>
+        <button class="emoji-item" title="upside-down face">🙃</button>
+        <button class="emoji-item" title="winking face">😉</button>
+        <button class="emoji-item" title="smiling face with halo">😇</button>
+        <button class="emoji-item" title="smiling face with hearts">🥰</button>
+        <button class="emoji-item" title="smiling face with heart-eyes">😍</button>
+        <button class="emoji-item" title="star-struck">🤩</button>
+      </div>
+    </div>
+
+    <!-- Footer Hints -->
+    <div class="picker-footer">
+      <div class="hotkey-group">
+        <span class="hotkey-item"><strong>Esc</strong> Close</span>
+        <span class="hotkey-item"><strong>↑↓←→</strong> Navigate</span>
+      </div>
+      <span class="hotkey-item"><strong>Enter</strong> Copy</span>
+    </div>
+  </div>
+
+</body>
+</html>

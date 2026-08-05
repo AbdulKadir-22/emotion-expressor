@@ -8,7 +8,13 @@ Glib::RefPtr<Application> Application::create() {
 }
 
 Application::Application()
-    : Gtk::Application("dev.emotion_expressor.EmojiPicker", Gio::Application::Flags::NONE) {
+    : Gtk::Application("dev.emotion_expressor.EmojiPicker", Gio::Application::Flags::HANDLES_COMMAND_LINE) {
+    add_main_option_entry(
+        Gio::Application::OptionType::BOOL,
+        "toggle",
+        't',
+        "Toggle the emoji picker window visibility"
+    );
 }
 
 Application::~Application() {
@@ -21,9 +27,36 @@ Application::~Application() {
 void Application::on_startup() {
     Gtk::Application::on_startup();
 
+    // Keep daemon running continuously in background even when window is hidden
+    hold();
+
     config_.load();
     load_database();
     load_styles();
+
+    if (!window_) {
+        window_ = new MainWindow(db_, config_);
+        add_window(*window_);
+    }
+
+    windowManager_ = std::make_unique<WindowManager>(*window_);
+    shortcutManager_ = std::make_unique<ShortcutManager>();
+
+    std::string shortcut = config_.getShortcut();
+    if (shortcut.empty()) {
+        shortcut = "Ctrl+.";
+    }
+
+    Logger::info("Application: Registering configured global shortcut: '{}'", shortcut);
+    bool registered = shortcutManager_->registerShortcut(shortcut, [this]() {
+        if (windowManager_) {
+            windowManager_->toggle();
+        }
+    });
+
+    if (!registered) {
+        Logger::warn("Application: Global shortcut registration failed; application remains accessible via terminal 'emotion_expressor --toggle'");
+    }
 }
 
 void Application::load_database() {
@@ -64,10 +97,24 @@ void Application::load_styles() {
 }
 
 void Application::on_activate() {
-    if (!window_) {
-        window_ = new MainWindow(db_, config_);
-        add_window(*window_);
+    if (windowManager_) {
+        windowManager_->show();
     }
-    window_->prepare_for_show();
-    window_->present();
+}
+
+int Application::on_command_line(const Glib::RefPtr<Gio::ApplicationCommandLine>& command_line) {
+    auto options = command_line->get_options_dict();
+    bool isToggle = options->contains("toggle");
+
+    Logger::info("Application: Received command line invocation (isToggle: {})", isToggle);
+
+    if (windowManager_) {
+        if (isToggle) {
+            windowManager_->toggle();
+        } else {
+            windowManager_->show();
+        }
+    }
+
+    return 0;
 }

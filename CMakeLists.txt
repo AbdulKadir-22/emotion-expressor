@@ -88,8 +88,9 @@ add_executable(emoji_tests
     tests/test_database.cpp
     tests/test_search.cpp
     tests/test_config.cpp
+    tests/test_shortcuts.cpp
 )
-target_link_libraries(emoji_tests PRIVATE emoji_core Catch2::Catch2WithMain)
+target_link_libraries(emoji_tests PRIVATE emoji_core emoji_ui Catch2::Catch2WithMain)
 
 include(Catch)
 catch_discover_tests(emoji_tests)

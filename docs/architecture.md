@@ -8,26 +8,27 @@ Emotion Expressor is designed as a modular, high-performance native Linux applic
 2. **Allocation-Conscious Performance**: Keystroke search latency is kept under 0.5 ms by precomputing lowercased searchable fields at load time and using `std::string_view` comparisons.
 3. **Multi-Phase Roadmap**:
    - **Phase 1 (Completed)**: Core Data Layer & CLI Harness.
-   - **Phase 2**: GTK4 / gtkmm UI layout, grid view, search-as-you-type, and recent emoji tracking.
-   - **Phase 3**: Global keyboard shortcut daemon (XDG Desktop Portal / Wayland) & clipboard pasting (`wl-clipboard` / GTK Clipboard).
+   - **Phase 2 (Completed)**: GTK4 / gtkmm UI layout, grid view, search-as-you-type, and recent emoji tracking.
+   - **Phase 3 (Completed)**: Persistent background daemon (`hold()`), global keyboard shortcut manager (XDG Desktop Portal & GNOME GSettings fallback), instant toggle, and focus-loss dismissal.
    - **Phase 4**: Flatpak packaging, autostart service, and final memory/performance profiling.
 
 ## Component Overview
 
 ```mermaid
 graph TD
-    CLI[main.cpp CLI Harness] -->|uses| DB[EmojiDatabase]
-    CLI -->|uses| Search[EmojiSearch]
-    CLI -->|uses| Config[Config Manager]
-    CLI -->|uses| Log[Logger Utility]
+    App[Application Daemon Gtk::Application] -->|manages| WM[WindowManager]
+    App -->|manages| SM[ShortcutManager]
+    App -->|holds instance| DB[EmojiDatabase]
+    App -->|loads| Config[Config Manager]
+    App -->|loads| Log[Logger Utility]
 
+    WM -->|controls show/hide| Win[MainWindow]
+    SM -->|triggers| WM
+    SM -->|registers via| Portal[XDG Desktop Portal / GSettings]
+
+    Win -->|uses| Search[EmojiSearch Engine]
     Search -->|searches| DB
-    DB -->|loads| JSON[data/emojis.json]
-    DB -->|contains| Emoji[Emoji Struct]
-    
-    UI[Phase 2: GTK4 UI] -->|consumes| Search
-    UI -->|consumes| Config
-    UI -->|copies via| Clipboard[Platform Clipboard]
+    Win -->|copies via| Clipboard[Platform Clipboard]
 ```
 
 ## Licensing & Third-Party Dependencies

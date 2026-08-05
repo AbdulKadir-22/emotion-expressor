@@ -1,7 +1,21 @@
 #pragma once
 
-// Stubbed for Phase 3: System-level window management (Wayland layer-shell / positioning)
+#include "ui/MainWindow.hpp"
+#include <sigc++/sigc++.h>
+
 class WindowManager {
 public:
-    WindowManager() = default;
+    explicit WindowManager(MainWindow& window);
+    ~WindowManager() = default;
+
+    void show();
+    void hide();
+    void toggle();
+    bool isVisible() const;
+
+private:
+    void centerOnActiveMonitor();
+
+    MainWindow& window_;
+    sigc::connection focusLossConnection_;
 };

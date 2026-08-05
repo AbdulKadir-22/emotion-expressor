@@ -3,12 +3,16 @@
 
 A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Linux desktop environments.
 
-## Features (Phase 1: Core Data Layer)
+## Features
 
 - **Pure C++20 Core Logic**: Decoupled core data layer with zero GUI dependencies.
 - **Fast Startup & Dataset**: Loads **1,870 Unicode emojis** from a structured dataset in **~15 ms**.
 - **Sub-Millisecond Ranked Search**: High-performance search engine returning ranked matches in **< 500 microseconds**.
 - **Allocation-Conscious Design**: Precomputed lowercase search strings to prevent memory allocations per keystroke.
+- **Persistent Background Daemon**: Runs continuously in background (`0.0%` idle CPU) and pops up instantly on global hotkey trigger (`Ctrl+.`).
+- **Multi-Backend Global Shortcuts**: Multi-tier shortcut registration supporting **XDG Desktop Portal `GlobalShortcuts`** with GNOME **`gsettings` custom-keybinding** fallback.
+- **Instant Focus & Dismissal**: Auto-focuses search entry on presentation and dismisses cleanly on `Esc` or focus loss.
+- **Single-Instance D-Bus Activation**: Launching `emotion_expressor --toggle` signals existing daemon instance via D-Bus IPC.
 - **Multi-Tier Search Priority**:
   1. Exact Name / Character Match (`1000 pts`)
   2. Exact Alias Match e.g. `:smile:` (`950 pts`)
@@ -33,7 +37,8 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 ├── docs/
 │   ├── architecture.md     # Multi-phase system architecture
 │   ├── phase1_core.md      # Core data layer API documentation
-│   └── phase2_ui.md        # GTK4 / gtkmm UI layer API documentation
+│   ├── phase2_ui.md        # GTK4 / gtkmm UI layer API documentation
+│   └── phase3_platform.md  # Background daemon & global shortcuts API documentation
 ├── src/
 │   ├── app/                # GTK Application setup & CSS provider
 │   ├── core/
@@ -50,7 +55,8 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 └── tests/                  # Catch2 unit test suite
     ├── test_database.cpp
     ├── test_search.cpp
-    └── test_config.cpp
+    ├── test_config.cpp
+    └── test_shortcuts.cpp
 ```
 
 ---
@@ -59,6 +65,7 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 
 - **C++ Compiler**: GCC 13+ or Clang 16+ supporting C++20 (tested on GCC 16.1 / Fedora)
 - **Build System**: CMake 3.20+ and Ninja or Make
+- **Libraries**: `gtkmm-4.0`
 
 ---
 
@@ -70,11 +77,18 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 # Configure build directory
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-# Compile core library, CLI harness, and unit tests
+# Compile application daemon, CLI harness, and unit tests
 cmake --build build
 ```
 
-### 2. Run Unit Tests
+### 2. Run Background Daemon / Toggle Window
+
+```bash
+# Start background daemon (or toggle window visibility)
+./build/emotion_expressor --toggle
+```
+
+### 3. Run Unit Tests
 
 ```bash
 ctest --test-dir build --output-on-failure
@@ -86,7 +100,7 @@ Or run the Catch2 test runner directly:
 ./build/emoji_tests
 ```
 
-### 3. Run CLI Smoke Test
+### 4. Run CLI Smoke Test
 
 Single query execution:
 
@@ -109,7 +123,7 @@ Interactive REPL mode:
 
 - [x] **Phase 1**: Core Data Layer (Dataset, Database, Ranked Search Engine, Config, Logger, CLI & Tests)
 - [x] **Phase 2**: GTK4 / gtkmm UI (Window layout, SearchBar, ListView, real-time filtering & clipboard copy)
-- [ ] **Phase 3**: Global Shortcuts & Wayland Clipboard Integration (Portal / XDG Global Shortcuts)
+- [x] **Phase 3**: Global Shortcuts & Persistent Background Daemon (XDG Portal / GSettings, WindowManager, D-Bus activation)
 - [ ] **Phase 4**: Packaging, Flatpak & Performance Optimization
 
 ---
