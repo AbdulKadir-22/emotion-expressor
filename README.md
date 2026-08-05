@@ -23,6 +23,7 @@ A lightweight, native Linux emoji picker built in C++20 for GNOME/Wayland and Li
 - **Config & Logging**:
   - Thread-safe leveled `Logger` (DEBUG, INFO, WARN, ERROR) supporting C++20 `std::format`.
   - JSON configuration manager storing shortcut bindings and recent emojis at `~/.config/emoji-picker/config.json`.
+- **Modern Dark Slate UI**: High-fidelity 7-column emoji tile grid with royal blue selection ring (`#2563eb`), 2D keyboard navigation (`Up/Down/Left/Right`), and dynamic footer preview card displaying selected emoji details and key command badges (`Esc Close`, `Enter Copy`).
 - **CLI Harness & Test Suite**: Included CLI smoke test harness and Catch2 unit test suite integrated with CTest.
 
 ---

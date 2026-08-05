@@ -30,6 +30,7 @@ public:
 
 private:
     void on_search_changed(const std::string& query);
+    void update_preview();
     void on_row_activated(guint position);
     bool on_key_pressed(guint keyval, guint keycode, Gdk::ModifierType state);
     void move_selection(int delta);
@@ -42,9 +43,20 @@ private:
     Gtk::Box rootBox_{Gtk::Orientation::VERTICAL, 0};
     SearchBar searchBar_;
     Gtk::ScrolledWindow scrolledWindow_;
-    Gtk::ListView listView_;
+    Gtk::GridView gridView_;
     Glib::RefPtr<Gio::ListStore<EmojiItem>> listStore_;
     Glib::RefPtr<Gtk::SingleSelection> selectionModel_;
-    Gtk::Box footerBox_{Gtk::Orientation::HORIZONTAL, 8};
+
+    // Footer Card Components
+    Gtk::Box footerCard_{Gtk::Orientation::HORIZONTAL, 0};
+    Gtk::Box previewBox_{Gtk::Orientation::HORIZONTAL, 12};
+    Gtk::Label previewGlyph_{"😄"};
+    Gtk::Box previewDetailsBox_{Gtk::Orientation::VERTICAL, 2};
+    Gtk::Label previewName_{"Grinning Face With Smiling Eyes"};
+    Gtk::Label previewAlias_{":smile:"};
+
+    Gtk::Box hotkeyBox_{Gtk::Orientation::HORIZONTAL, 10};
     Glib::RefPtr<Gtk::EventControllerKey> keyController_;
+
+    static constexpr guint GRID_COLUMNS = 7;
 };

@@ -1,89 +1,160 @@
-/* Emotion Expressor - GTK4 / gtkmm4 Stylesheet */
+/* Emotion Expressor - GTK4 / gtkmm4 Modern Dark Slate Stylesheet */
 
-window.popup-window {
+window.popup-window,
+window {
     background-color: transparent;
 }
 
 .app-container {
-    background-color: #1e1e2e;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    background-color: #111420;
+    border: 1px solid #1f273b;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
     margin: 10px;
-    padding: 12px;
+    padding: 14px;
 }
 
+/* Header & Search Bar */
 .search-bar-container {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .search-entry {
-    background-color: #2a2a3c;
-    color: #cdd6f4;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 8px 12px;
-    font-size: 14px;
+    background-color: #1b2131;
+    color: #e2e8f0;
+    border-radius: 10px;
+    border: 1px solid #283147;
+    padding: 8px 14px;
+    font-size: 15px;
+    min-height: 42px;
 }
 
-.search-entry:focus-within {
-    border-color: #89b4fa;
-    box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
+.search-entry:focus-within,
+.search-entry:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
+/* Scrolled Window & GridView */
 .emoji-scrolled {
     background-color: transparent;
     border: none;
 }
 
-.emoji-list {
+.emoji-grid-view,
+gridview {
     background-color: transparent;
+    background-image: none;
 }
 
-.emoji-row {
-    padding: 8px 10px;
-    border-radius: 8px;
-    margin-bottom: 2px;
+/* Strip ALL default GTK theme selection backgrounds and focus outlines from all grid children */
+gridview > child,
+gridview child,
+child,
+gridview > child:selected,
+gridview > child:selected:focus,
+gridview > child:focus,
+gridview > child:focus-visible,
+gridview > child:hover,
+gridview > child:active,
+gridview child:selected,
+gridview child:focus,
+gridview child:focus-visible,
+child:selected,
+child:focus,
+child:focus-visible,
+child:active {
+    background: none;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    outline: none;
+    outline-color: transparent;
+    outline-style: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
 }
 
-listview row:hover .emoji-row {
-    background-color: #313244;
+/* Custom Emoji Tile (7 Columns Grid Tile) */
+.emoji-tile {
+    background-color: #171d2b;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    min-width: 52px;
+    min-height: 52px;
+    margin: 1px;
+    padding: 3px;
+    transition: all 120ms ease-in-out;
 }
 
-listview row:selected .emoji-row {
-    background-color: #45475a;
+gridview > child:hover .emoji-tile,
+gridview child:hover .emoji-tile,
+.emoji-tile:hover {
+    background-color: #222a3e;
 }
 
-.emoji-glyph {
+/* Active Selected state - Clean 2px Blue Ring directly on tile */
+gridview > child:selected .emoji-tile,
+gridview child:selected .emoji-tile {
+    background-color: #1d2844;
+    border: 2px solid #2563eb;
+    padding: 2px;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Emoji Glyph Label Centering */
+.emoji-tile-glyph {
     font-size: 26px;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dynamic Footer Preview Card */
+.footer-preview-card {
+    background-color: #161c2a;
+    border: 1px solid #242d42;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-top: 12px;
+}
+
+.preview-glyph-large {
+    font-size: 32px;
     margin-right: 12px;
 }
 
-.emoji-name {
+.preview-title-text {
     font-weight: 600;
-    font-size: 14px;
-    color: #cdd6f4;
+    font-size: 13px;
+    color: #e2e8f0;
 }
 
-.emoji-detail {
+.preview-alias-text {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Key Command Badges */
+.kbd-badge {
+    background-color: #1f283b;
+    border: 1px solid #2d3852;
+    border-radius: 5px;
+    padding: 2px 7px;
     font-size: 11px;
-    color: #a6adc8;
+    font-family: monospace;
+    color: #8c9bb5;
+    font-weight: 600;
 }
 
-.footer-bar {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 8px;
-    margin-top: 8px;
-    justify-content: center;
-}
-
-.footer-hint {
-    font-size: 11px;
-    color: #a6adc8;
-    font-weight: 500;
+.kbd-label {
+    font-size: 12px;
+    color: #8c9bb5;
 }
 
 .footer-sep {
-    font-size: 11px;
-    color: #585b70;
+    font-size: 14px;
+    color: #242d42;
+    margin: 0 4px;
 }
