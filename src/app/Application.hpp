@@ -30,4 +30,6 @@ private:
     MainWindow* window_{nullptr};
     std::unique_ptr<WindowManager> windowManager_;
     std::unique_ptr<ShortcutManager> shortcutManager_;
+    Glib::RefPtr<Gtk::CssProvider> cssProvider_;
 };
+

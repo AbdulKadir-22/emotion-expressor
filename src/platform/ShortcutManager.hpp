@@ -35,6 +35,7 @@ private:
 
     Glib::RefPtr<Gio::DBus::Connection> dbusConn_;
     guint portalSignalSubscriptionId_{0};
-    std::string portalSessionHandle_;
+    Glib::ustring portalSessionHandle_;
+    guint portalResponseSubId_{0};
     std::string gsettingsPath_;
 };

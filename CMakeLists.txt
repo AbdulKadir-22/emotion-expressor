@@ -12,23 +12,28 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-include(FetchContent)
+# nlohmann_json Dependency (system package or FetchContent fallback)
+find_package(nlohmann_json 3.11 QUIET)
+if(NOT nlohmann_json_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        nlohmann_json
+        URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
 
-# Fetch nlohmann_json via release tarball
-FetchContent_Declare(
-    nlohmann_json
-    URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-FetchContent_MakeAvailable(nlohmann_json)
-
-# Fetch Catch2 test framework via release tarball
-FetchContent_Declare(
-    Catch2
-    URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.5.2.tar.gz
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-FetchContent_MakeAvailable(Catch2)
+option(BUILD_TESTING "Build unit tests" ON)
+if(BUILD_TESTING)
+    include(FetchContent)
+    FetchContent_Declare(
+        Catch2
+        URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.5.2.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(Catch2)
+endif()
 
 # GTK4 / gtkmm-4.0 Dependency
 find_package(PkgConfig REQUIRED)
@@ -74,6 +79,10 @@ target_link_libraries(emoji_ui PUBLIC emoji_core PkgConfig::GTKMM)
 add_executable(emotion_expressor src/main.cpp)
 target_link_libraries(emotion_expressor PRIVATE emoji_ui)
 
+install(TARGETS emotion_expressor DESTINATION bin)
+install(DIRECTORY data DESTINATION share/emotion-expressor)
+install(DIRECTORY assets DESTINATION share/emotion-expressor)
+
 # CLI Smoke Test Executable Target (Phase 1 regression checking)
 add_executable(emoji_picker_cli src/cli_main.cpp)
 target_link_libraries(emoji_picker_cli PRIVATE emoji_core)
@@ -82,15 +91,17 @@ add_executable(emoji_cli src/cli_main.cpp)
 target_link_libraries(emoji_cli PRIVATE emoji_core)
 
 # Unit Tests Executable
-enable_testing()
+if(BUILD_TESTING)
+    enable_testing()
 
-add_executable(emoji_tests
-    tests/test_database.cpp
-    tests/test_search.cpp
-    tests/test_config.cpp
-    tests/test_shortcuts.cpp
-)
-target_link_libraries(emoji_tests PRIVATE emoji_core emoji_ui Catch2::Catch2WithMain)
+    add_executable(emoji_tests
+        tests/test_database.cpp
+        tests/test_search.cpp
+        tests/test_config.cpp
+        tests/test_shortcuts.cpp
+    )
+    target_link_libraries(emoji_tests PRIVATE emoji_core emoji_ui Catch2::Catch2WithMain)
 
-include(Catch)
-catch_discover_tests(emoji_tests)
+    include(Catch)
+    catch_discover_tests(emoji_tests)
+endif()

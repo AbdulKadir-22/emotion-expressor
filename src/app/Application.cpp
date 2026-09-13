@@ -8,7 +8,7 @@ Glib::RefPtr<Application> Application::create() {
 }
 
 Application::Application()
-    : Gtk::Application("dev.emotion_expressor.EmojiPicker", Gio::Application::Flags::HANDLES_COMMAND_LINE) {
+    : Gtk::Application("in.abdulkadir.clipmoji", Gio::Application::Flags::HANDLES_COMMAND_LINE) {
     add_main_option_entry(
         Gio::Application::OptionType::BOOL,
         "toggle",
@@ -59,11 +59,42 @@ void Application::on_startup() {
     }
 }
 
-void Application::load_database() {
-    std::filesystem::path dbPath = "data/emojis.json";
-    if (!std::filesystem::exists(dbPath) && std::filesystem::exists("../data/emojis.json")) {
-        dbPath = "../data/emojis.json";
+namespace {
+std::filesystem::path resolve_resource_path(const std::string& relativePath) {
+    // 1. Try CWD relative
+    if (std::filesystem::exists(relativePath)) {
+        return relativePath;
     }
+    if (std::filesystem::exists("../" + relativePath)) {
+        return "../" + relativePath;
+    }
+
+    // 2. Try executable directory relative (/proc/self/exe on Linux)
+    try {
+        if (std::filesystem::exists("/proc/self/exe")) {
+            std::filesystem::path exePath = std::filesystem::canonical("/proc/self/exe");
+            std::filesystem::path exeDir = exePath.parent_path();
+
+            if (std::filesystem::exists(exeDir / relativePath)) {
+                return exeDir / relativePath;
+            }
+            if (std::filesystem::exists(exeDir / ".." / relativePath)) {
+                return exeDir / ".." / relativePath;
+            }
+            if (std::filesystem::exists(exeDir / ".." / "share" / "emotion-expressor" / relativePath)) {
+                return exeDir / ".." / "share" / "emotion-expressor" / relativePath;
+            }
+        }
+    } catch (...) {
+        // Ignore resolution errors if /proc/self/exe is unavailable
+    }
+
+    return relativePath;
+}
+} // namespace
+
+void Application::load_database() {
+    std::filesystem::path dbPath = resolve_resource_path("data/emojis.json");
 
     if (!db_.load(dbPath)) {
         Logger::error("Application: Failed to load emoji database from path {}", dbPath.string());
@@ -73,19 +104,16 @@ void Application::load_database() {
 }
 
 void Application::load_styles() {
-    std::filesystem::path cssPath = "assets/styles/style.css";
-    if (!std::filesystem::exists(cssPath) && std::filesystem::exists("../assets/styles/style.css")) {
-        cssPath = "../assets/styles/style.css";
-    }
+    std::filesystem::path cssPath = resolve_resource_path("assets/styles/style.css");
 
     if (std::filesystem::exists(cssPath)) {
-        auto provider = Gtk::CssProvider::create();
+        cssProvider_ = Gtk::CssProvider::create();
         try {
-            provider->load_from_path(cssPath.string());
+            cssProvider_->load_from_path(cssPath.string());
             Gtk::StyleContext::add_provider_for_display(
                 Gdk::Display::get_default(),
-                provider,
-                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+                cssProvider_,
+                GTK_STYLE_PROVIDER_PRIORITY_USER
             );
             Logger::info("Loaded CSS styles from {}", cssPath.string());
         } catch (const Glib::Error& ex) {
