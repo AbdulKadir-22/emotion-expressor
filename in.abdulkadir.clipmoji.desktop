@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Clipmoji
+Comment=Fast GTK4 emoji picker for Linux desktop environments
+Exec=emotion_expressor
+Icon=in.abdulkadir.clipmoji
+Terminal=false
+Type=Application
+Categories=Utility;GTK;
+Keywords=emoji;picker;clipmoji;clipboard;
+StartupNotify=true

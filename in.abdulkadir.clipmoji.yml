@@ -1,0 +1,92 @@
+app-id: in.abdulkadir.clipmoji
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: emotion_expressor
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  - --talk-name=org.freedesktop.portal.Desktop
+  - --talk-name=org.freedesktop.portal.Clipboard
+
+build-options:
+  env:
+    CC: gcc
+    CXX: g++
+    CCACHE_DISABLE: '1'
+
+modules:
+  - name: libsigcplusplus
+    buildsystem: meson
+    config-opts:
+      - -Dbuild-examples=false
+      - -Dbuild-tests=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libsigc++/3.6/libsigc++-3.6.0.tar.xz
+        sha256: c3d23b37dfd6e39f2e09f091b77b1541fbfa17c4f0b6bf5c89baef7229080e17
+
+  - name: glibmm
+    buildsystem: meson
+    config-opts:
+      - -Dbuild-examples=false
+      - -Dbuild-documentation=false
+      - -Db_pch=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/glibmm/2.82/glibmm-2.82.0.tar.xz
+        sha256: 38684cff317273615c67b8fa9806f16299d51e5506d9b909bae15b589fa99cb6
+
+  - name: cairomm
+    buildsystem: meson
+    config-opts:
+      - -Dbuild-examples=false
+      - -Dbuild-tests=false
+      - -Db_pch=false
+    sources:
+      - type: archive
+        url: https://cairographics.org/releases/cairomm-1.18.0.tar.xz
+        sha256: b81255394e3ea8e8aa887276d22afa8985fc8daef60692eb2407d23049f03cfb
+
+  - name: pangomm
+    buildsystem: meson
+    config-opts:
+      - -Db_pch=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/pangomm/2.54/pangomm-2.54.0.tar.xz
+        sha256: 4a5b1fd1b7c47a1af45277ea82b5abeaca8e08fb10a27daa6394cf88d74e7acf
+
+  - name: gtkmm
+    buildsystem: meson
+    config-opts:
+      - -Dbuild-demos=false
+      - -Dbuild-tests=false
+      - -Db_pch=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/gtkmm/4.16/gtkmm-4.16.0.tar.xz
+        sha256: 3b23fd3abf8fb223b00e9983b6010af2db80e38c89ab6994b8b6230aa85d60f9
+
+  - name: nlohmann-json
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DJSON_BuildTests=OFF
+    sources:
+      - type: archive
+        url: https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
+        sha256: 0d8ef5af7f9794e3263480193c491549b2ba6cc74bb018906202ada498a79406
+
+  - name: clipmoji
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DBUILD_TESTING=OFF
+    sources:
+      - type: dir
+        path: .
+    post-install:
+      - install -Dm644 in.abdulkadir.clipmoji.desktop /app/share/applications/in.abdulkadir.clipmoji.desktop
+      - install -Dm644 in.abdulkadir.clipmoji.metainfo.xml /app/share/metainfo/in.abdulkadir.clipmoji.metainfo.xml
+      - install -Dm644 data/icons/in.abdulkadir.clipmoji.svg /app/share/icons/hicolor/scalable/apps/in.abdulkadir.clipmoji.svg

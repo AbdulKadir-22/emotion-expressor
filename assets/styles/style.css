@@ -50,7 +50,6 @@ gridview {
 /* Strip ALL default GTK theme selection backgrounds and focus outlines from all grid children */
 gridview > child,
 gridview child,
-child,
 gridview > child:selected,
 gridview > child:selected:focus,
 gridview > child:focus,
@@ -59,11 +58,7 @@ gridview > child:hover,
 gridview > child:active,
 gridview child:selected,
 gridview child:focus,
-gridview child:focus-visible,
-child:selected,
-child:focus,
-child:focus-visible,
-child:active {
+gridview child:focus-visible {
     background: none;
     background-color: transparent;
     background-image: none;

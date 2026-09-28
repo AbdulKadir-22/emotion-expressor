@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>in.abdulkadir.clipmoji</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Clipmoji</name>
+  <summary>Fast GTK4 emoji picker for Linux</summary>
+
+  <description>
+    <p>
+      Clipmoji is a lightweight, high-performance emoji picker built with GTK4 and C++20 for Linux desktop environments.
+    </p>
+    <p>
+      Features include sub-millisecond ranked search, instant focus and dismissal, global keyboard shortcut support, and multi-backend platform integration.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">in.abdulkadir.clipmoji.desktop</launchable>
+
+  <url type="homepage">https://github.com/Abdulkadir-22/emotion-expressor</url>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="0.1.0" date="2026-08-06">
+      <description>
+        <p>Initial release of Clipmoji emoji picker.</p>
+      </description>
+    </release>
+  </releases>
+
+  <icon type="stock">in.abdulkadir.clipmoji</icon>
+</component>
