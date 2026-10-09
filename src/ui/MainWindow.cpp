@@ -201,7 +201,7 @@ void MainWindow::on_search_changed(const std::string& query) {
 
     if (listStore_->get_n_items() > 0) {
         selectionModel_->set_selected(0);
-        gridView_.scroll_to(0);
+        gtk_grid_view_scroll_to(gridView_.gobj(), 0, GTK_LIST_SCROLL_NONE, nullptr);
     }
     update_preview();
 }
@@ -270,7 +270,7 @@ void MainWindow::move_selection(int delta) {
 
     if (next != current) {
         selectionModel_->set_selected(static_cast<guint>(next));
-        gridView_.scroll_to(static_cast<guint>(next));
+        gtk_grid_view_scroll_to(gridView_.gobj(), static_cast<guint>(next), GTK_LIST_SCROLL_NONE, nullptr);
         update_preview();
     }
 }
