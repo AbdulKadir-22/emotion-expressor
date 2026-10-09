@@ -79,16 +79,19 @@ target_link_libraries(emoji_ui PUBLIC emoji_core PkgConfig::GTKMM)
 add_executable(emotion_expressor src/main.cpp)
 target_link_libraries(emotion_expressor PRIVATE emoji_ui)
 
-install(TARGETS emotion_expressor DESTINATION bin)
-install(DIRECTORY data DESTINATION share/emotion-expressor)
-install(DIRECTORY assets DESTINATION share/emotion-expressor)
-
 # CLI Smoke Test Executable Target (Phase 1 regression checking)
 add_executable(emoji_picker_cli src/cli_main.cpp)
 target_link_libraries(emoji_picker_cli PRIVATE emoji_core)
 
 add_executable(emoji_cli src/cli_main.cpp)
 target_link_libraries(emoji_cli PRIVATE emoji_core)
+
+install(TARGETS emotion_expressor emoji_cli DESTINATION bin)
+install(FILES in.abdulkadir.clipmoji.desktop DESTINATION share/applications)
+install(FILES in.abdulkadir.clipmoji.metainfo.xml DESTINATION share/metainfo)
+install(FILES assets/icons/emotion-expressor.svg DESTINATION share/icons/hicolor/scalable/apps RENAME in.abdulkadir.clipmoji.svg)
+install(DIRECTORY data DESTINATION share/emotion-expressor)
+install(DIRECTORY assets DESTINATION share/emotion-expressor)
 
 # Unit Tests Executable
 if(BUILD_TESTING)
